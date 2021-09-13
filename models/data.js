@@ -10,7 +10,7 @@ const data = {
             db = await database.getDb();
 
             const result = await db.collection.find({}).toArray();
-            console.log(result);
+
             return res.json(result);
         } catch (e) {
             return res.status(500).json({
@@ -23,6 +23,45 @@ const data = {
             });
         } finally {
             await db.client.close();
+        }
+    },
+
+    getOne: async function (res, req) {
+        console.log(req.params.filename);
+        if (req.params.filename) {
+            let filter = {
+                "filename": req.params.filename
+            };
+
+            let db;
+
+            try {
+                db = await database.getDb();
+                const result = await db.collection.findOne(filter);
+                await db.collection.findOne(filter);
+
+                return res.json(result);
+            } catch (e) {
+                return res.status(500).json({
+                    error: {
+                        status: 500,
+                        path: "Get /data/:filename ",
+                        title: "Database error",
+                        message: e.message
+                    }
+                });
+            } finally {
+                await db.client.close();
+            }
+        } else {
+            return res.status(500).json({
+                error: {
+                    status: 500,
+                    path: "Get /data no filename",
+                    title: "No filename",
+                    message: "No data id provided"
+                }
+            });
         }
     },
 
@@ -107,8 +146,6 @@ const data = {
             let filter = {
                 "filename": req.body.filename
             };
-
-
 
             let db;
 
