@@ -6,7 +6,7 @@
 
 GET /data
 
-##Get one file with filename
+## Get one file with filename
 
 GET /data/:filename
 
@@ -21,9 +21,8 @@ POST /data with bodyParser
 
 DELETE /data wtih bodyParser
 {filename:"file1"}
--------------------
+
 ## Update a file
 
 PUT /data  wtih bodyParser
 {"content", "this is a test"}
--------------------
