@@ -14,7 +14,6 @@ const database = {
             const config = require("./config.json");
             dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/editor?retryWrites=true&w=majority`;
         }
-        console.log(dsn);
 
         const client  = await mongo.connect(dsn, {
             useNewUrlParser: true,

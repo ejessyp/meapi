@@ -109,10 +109,8 @@ const data = {
                 db = await database.getDb();
 
                 const result = await db.collection.findOneAndUpdate(filter, {$set: {"content": req.body.content }},
-                {
-                    returnNewDocument: true
-                });
-
+                {returnDocument: "after"});
+                console.log(result);
                 return res.json(result.value);
             } catch (e) {
                 return res.status(500).json({
