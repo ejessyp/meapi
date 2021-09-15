@@ -6,10 +6,10 @@ Clone the repo and run the testsuite using a local environment(a local mongodb: 
 
 ## Local development environment
 Install the development tools and execute the validation tools and the testsuite.
-´´´´
-npm install
-npm test
-´´´´
+
+    npm install
+    npm test
+
 ## Get all files
 
 GET /data
