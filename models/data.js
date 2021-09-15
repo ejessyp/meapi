@@ -110,7 +110,7 @@ const data = {
 
                 const result = await db.collection.findOneAndUpdate(filter, {$set: {"content": req.body.content }},
                 {returnDocument: "after"});
-                console.log(result);
+                
                 return res.json(result.value);
             } catch (e) {
                 return res.status(500).json({
