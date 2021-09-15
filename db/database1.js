@@ -1,6 +1,6 @@
 // MongoDB
 const mongo = require("mongodb").MongoClient;
-
+const config = require("./config.json");
 const collectionName = "files";
 
 const database = {
@@ -9,12 +9,11 @@ const database = {
         let dsn;
 
         if (process.env.NODE_ENV === 'test') {
-            dsn = "mongodb://localhost:27017/test";
+            dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/test?retryWrites=true&w=majority`;
         }  else {
-            const config = require("./config.json");
+
             dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/editor?retryWrites=true&w=majority`;
         }
-        console.log(dsn);
 
         const client  = await mongo.connect(dsn, {
             useNewUrlParser: true,
