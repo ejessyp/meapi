@@ -27,7 +27,6 @@ const data = {
     },
 
     getOne: async function (res, req) {
-        console.log(req.params.filename);
         if (req.params.filename) {
             let filter = {
                 "filename": req.params.filename
@@ -79,7 +78,7 @@ const data = {
             }
 
             const result = await db.collection.insertOne(data);
-            console.log(result);
+
             if (result) {
                 return res.status(201).json(data);
             }
@@ -109,12 +108,12 @@ const data = {
             try {
                 db = await database.getDb();
 
-                await db.collection.findOneAndUpdate(filter, {$set: {"content": req.body.content }},
+                const result = await db.collection.findOneAndUpdate(filter, {$set: {"content": req.body.content }},
                 {
                     returnNewDocument: true
                 });
 
-                return res.status(204).send();
+                return res.json(result.value);
             } catch (e) {
                 return res.status(500).json({
                     error: {
@@ -141,6 +140,7 @@ const data = {
 
     deleteData: async function (res, req) {
         // req contains user object set in checkToken middleware
+
         if (req.body.filename) {
 
             let filter = {
@@ -152,14 +152,19 @@ const data = {
             try {
                 db = await database.getDb();
 
-                await db.collection.deleteOne(filter);
+                const result = await db.collection.deleteOne(filter);
+                // console.log(res.deletedCount);
+                if (result.deletedCount === 1) {
+                    return res.status(204).send();
+                } else {
+                    return res.status(404).send();
+                }
 
-                return res.status(204).send();
             } catch (e) {
                 return res.status(500).json({
                     error: {
                         status: 500,
-                        path: "DELETE /data DELETE",
+                        path: "DELETE /data/filename",
                         title: "Database error",
                         message: e.message
                     }
@@ -171,7 +176,7 @@ const data = {
             return res.status(500).json({
                 error: {
                     status: 500,
-                    path: "PUT /data no filename",
+                    path: "DELETE /data no filename",
                     title: "No filename",
                     message: "No filename provided"
                 }
