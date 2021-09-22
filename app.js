@@ -9,7 +9,7 @@ const httpServer = require("http").createServer(app);
 
 const io = require("socket.io")(httpServer, {
     cors: {
-        origin: ["http://localhost:3000", "https://www.student.bth.se/~"]
+        origin: ["http://localhost:3000", "https://www.student.bth.se/~"],
         methods: ["GET", "POST"]
     }
 });
