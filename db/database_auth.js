@@ -1,21 +1,22 @@
 // MongoDB
 const mongo = require("mongodb").MongoClient;
-const config = require("./config.json");
-const collectionName = "files";
+const collectionName = "users";
 
-const database = {
-    getDb: async function getDb () {
-
+const databaseAuth = {
+    getDb: async function getDb() {
         let dsn;
 
         if (process.env.NODE_ENV === 'test') {
-            dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/test?retryWrites=true&w=majority`;
-        }  else {
+            dsn = "mongodb://localhost:27017/test";
+        } else {
+            const config = require("./config.json");
 
+            // eslint-disable-next-line max-len
             dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/editor?retryWrites=true&w=majority`;
         }
-
-        const client  = await mongo.connect(dsn, {
+        // dsn = "mongodb://localhost:27017/test";
+        console.log(dsn);
+        const client = await mongo.connect(dsn, {
             useNewUrlParser: true,
             useUnifiedTopology: true,
         });
@@ -30,4 +31,4 @@ const database = {
     }
 };
 
-module.exports = database;
+module.exports = databaseAuth;

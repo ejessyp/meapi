@@ -16,7 +16,6 @@ const collectionName = "editor";
 
 chai.use(chaiHttp);
 
-let apiKey = "";
 let token = "";
 let _id = "";
 
@@ -29,15 +28,15 @@ describe('User_data', () => {
                 { name: collectionName }
             )
                 .next()
-                .then(async function(info) {
+                .then(async function (info) {
                     if (info) {
                         await db.collection.drop();
                     }
                 })
-                .catch(function(err) {
+                .catch(function (err) {
                     console.error(err);
                 })
-                .finally(async function() {
+                .finally(async function () {
                     await db.client.close();
                     resolve();
                 });

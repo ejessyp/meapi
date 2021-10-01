@@ -1,3 +1,6 @@
+// const collectionFile = require("../db/collection.json");
+// collectionName =collectionFile.files;
+
 const database = require("../db/database.js");
 const ObjectId = require('mongodb').ObjectId;
 
@@ -5,12 +8,16 @@ const data = {
     getAll: async function (res, req) {
         // req contains user object set in checkToken middleware
         let db;
+        let str = eval("/" + req.user.email + "/");
+
+        console.log(str);
+        let filter = { $or: [{ "owner": req.user.email }, { "allowed": { "$regex": str } }] };
 
         try {
             db = await database.getDb();
+            const result = await db.collection.find(filter).toArray();
 
-            const result = await db.collection.find({}).toArray();
-
+            console.log(result);
             return res.json(result);
         } catch (e) {
             return res.status(500).json({
@@ -37,6 +44,7 @@ const data = {
             try {
                 db = await database.getDb();
                 const result = await db.collection.findOne(filter);
+
                 await db.collection.findOne(filter);
 
                 return res.json(result);
@@ -64,7 +72,7 @@ const data = {
         }
     },
 
-    createData: async function(res, req) {
+    createData: async function (res, req) {
         // req contains user object set in checkToken middleware
         // let apiKey = req.body.api_key;
         // let email = req.user.email;
@@ -74,9 +82,11 @@ const data = {
             db = await database.getDb();
             const data = {
                 "filename": req.body.filename,
-                "content": req.body.content
-            }
+                "content": req.body.content,
+                "owner": req.user.email
+            };
 
+            console.log(data);
             const result = await db.collection.insertOne(data);
 
             if (result) {
@@ -108,9 +118,10 @@ const data = {
             try {
                 db = await database.getDb();
 
-                const result = await db.collection.findOneAndUpdate(filter, {$set: {"content": req.body.content }},
-                {returnDocument: "after"});
-                
+                // eslint-disable-next-line max-len
+                const result = await db.collection.findOneAndUpdate(filter, { $set: { "content": req.body.content } },
+                    { returnDocument: "after" });
+
                 return res.json(result.value);
             } catch (e) {
                 return res.status(500).json({
@@ -129,6 +140,47 @@ const data = {
                 error: {
                     status: 500,
                     path: "PUT /data no filename",
+                    title: "No filename",
+                    message: "No data id provided"
+                }
+            });
+        }
+    },
+
+    updateAllowed: async function (res, req) {
+        // req contains user object set in checkToken middleware
+        if (req.body.filename) {
+            let filter = {
+                "filename": req.body.filename
+            };
+
+            let db;
+
+            try {
+                db = await database.getDb();
+
+                // eslint-disable-next-line max-len
+                const result = await db.collection.findOneAndUpdate(filter, { $addToSet: { "allowed": req.body.allowed } },
+                    { returnDocument: "after" });
+                console.log(result.value);
+                return res.json(result.value);
+            } catch (e) {
+                return res.status(500).json({
+                    error: {
+                        status: 500,
+                        path: "PUT /data/updateAllowed UPDATE",
+                        title: "Database error",
+                        message: e.message
+                    }
+                });
+            } finally {
+                await db.client.close();
+            }
+        } else {
+            return res.status(500).json({
+                error: {
+                    status: 500,
+                    path: "PUT /data/allowed no filename",
                     title: "No filename",
                     message: "No data id provided"
                 }
