@@ -6,20 +6,6 @@ const cors = require('cors');
 
 const app = express();
 const httpServer = require("http").createServer(app);
-// graphql
-const visual = true;
-const { graphqlHTTP } = require('express-graphql');
-const {
-    GraphQLSchema
-} = require("graphql");
-
-const { RootQueryType, RootMutationType } = require("./graphql/root.js");
-
-const schema = new GraphQLSchema({
-    query: RootQueryType,
-    mutation: RootMutationType
-});
-
 
 const io = require("socket.io")(httpServer, {
     cors: {
@@ -46,6 +32,7 @@ io.on('connection', function (socket) {
 
 const auth = require("./routes/auth.js");
 const data = require("./routes/data.js");
+
 const authModel = require("./models/auth.js");
 
 const port = process.env.PORT || 1337;
@@ -68,18 +55,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(express.static(path.join(__dirname, "public")));
-
-
-app.use('/graphql',
-    (req, res, next) => authModel.checkToken(req, res, next),
-    graphqlHTTP({
-        schema: schema,
-        graphiql: visual, // Visual är satt till true under utveckling
-    })
-);
-
-
-
 app.use("/users", auth);
 app.use("/data", data);
 app.get('/', function (req, res) {

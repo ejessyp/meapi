@@ -194,7 +194,7 @@ const auth = {
         });
     },
 
-    
+
 
     checkToken: function(req, res, next) {
         let token = req.headers['x-access-token'];
@@ -211,7 +211,7 @@ const auth = {
                         }
                     });
                 }
-
+                // console.log("hello", token, decoded.email);
                 req.user = {};
                 req.user.email = decoded.email;
 
