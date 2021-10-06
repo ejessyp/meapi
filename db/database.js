@@ -6,15 +6,14 @@ const database = {
     getDb: async function getDb() {
         let dsn;
 
-        if (process.env.NODE_ENV === 'test') {
+        if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'local') {
             dsn = "mongodb://localhost:27017/test";
-        } else {
+        } else  {
             const config = require("./config.json");
 
             // eslint-disable-next-line max-len
             dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.pwqp2.mongodb.net/editor?retryWrites=true&w=majority`;
         }
-        // dsn = "mongodb://localhost:27017/test";
         const client = await mongo.connect(dsn, {
             useNewUrlParser: true,
             useUnifiedTopology: true,

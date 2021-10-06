@@ -46,7 +46,7 @@ const auth = {
 
             try {
                 db = await databaseAuth.getDb();
-                console.log(db);
+                // console.log(db);
                 let updateDoc = {
                     "email": email,
                     "password": hash

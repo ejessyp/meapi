@@ -1,6 +1,3 @@
-// const collectionFile = require("../db/collection.json");
-// collectionName =collectionFile.files;
-
 const database = require("../db/dbGraphFile.js");
 
 const graphData = {
@@ -29,6 +26,34 @@ const graphData = {
                     path: "/",
                 }
             })
+        } finally {
+            await db.client.close();
+        }
+    },
+
+    getFiles: async function getFiles(res, email) {
+        let db;
+        let str = eval("/" + email + "/");
+
+        console.log(str);
+        let filter = { $or: [{ "owner": email }, { "allowed": { "$regex": str } }] };
+
+        try {
+            db = await database.getDb();
+            const result = await db.collection.find(filter).toArray();
+
+            console.log(result);
+            return result;
+            // return res.json(result);
+        } catch (e) {
+            return res.status(500).json({
+                errors: {
+                    status: 500,
+                    path: "/data",
+                    title: "Database error",
+                    message: e.message
+                }
+            });
         } finally {
             await db.client.close();
         }
@@ -74,7 +99,7 @@ const graphData = {
         }
     },
 
-    updateContent: async function (res, filename, content) {
+    updateContent: async function updateContent(res, filename, content) {
         // req contains user object set in checkToken middleware
         if (filename) {
             let filter = {
@@ -116,7 +141,7 @@ const graphData = {
         }
     },
 
-    updateAllowed: async function (res=undefined, filename, allowed) {
+    updateAllowed: async function updateAllowed(res=undefined, filename, allowed) {
         // req contains user object set in checkToken middleware
         if (filename) {
             let filter = {
@@ -132,6 +157,7 @@ const graphData = {
                 const result = await db.collection.findOneAndUpdate(filter, { $addToSet: { "allowed": allowed } },
                     { returnDocument: "after" });
                 // console.log(result.value);
+
                 return result.value;
                 // return res.json(result.value);
             } catch (e) {
@@ -179,6 +205,7 @@ const graphData = {
             // if (result) {
             //     return res.status(201).json(data);
             // }
+
             if (res === undefined) {
                 return data;
             }

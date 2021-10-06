@@ -29,8 +29,12 @@ const RootQueryType = new GraphQLObjectType({
         files: {
             type: GraphQLList(FileType),
             description: 'List of all files',
-            resolve: async function () {
-                return await files.getAll();
+            args: {
+                owner: { type: GraphQLString }
+            },
+            resolve: async function (parent, args) {
+                // console.log("ddddddddddowner", args.owner);
+                return await files.getFiles(undefined, args.owner);
             }
         }
     })

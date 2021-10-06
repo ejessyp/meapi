@@ -6,6 +6,7 @@
   "scripts": {
     "test": "nyc --reporter=html --reporter=text mocha './test/*.js'",
     "start": "node app.js",
+    "local": "set NODE_ENV=local && node app.js",
     "watch": "nodemon app.js",
     "production": "NODE_ENV='production' node app.js",
     "eslint": "eslint ."

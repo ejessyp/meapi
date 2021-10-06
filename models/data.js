@@ -1,8 +1,4 @@
-// const collectionFile = require("../db/collection.json");
-// collectionName =collectionFile.files;
-
 const database = require("../db/database.js");
-const ObjectId = require('mongodb').ObjectId;
 
 const data = {
     getAll: async function (res, req) {
@@ -192,7 +188,6 @@ const data = {
         // req contains user object set in checkToken middleware
 
         if (req.body.filename) {
-
             let filter = {
                 "filename": req.body.filename
             };
@@ -204,12 +199,12 @@ const data = {
 
                 const result = await db.collection.deleteOne(filter);
                 // console.log(res.deletedCount);
+
                 if (result.deletedCount === 1) {
                     return res.status(204).send();
                 } else {
                     return res.status(404).send();
                 }
-
             } catch (e) {
                 return res.status(500).json({
                     error: {
