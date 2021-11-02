@@ -15,6 +15,9 @@ const FileType = new GraphQLObjectType({
         allowed: {
             type: GraphQLList(GraphQLString)
         },
+        mode:  {
+            type: GraphQLList(GraphQLString)
+        }
     })
 });
 

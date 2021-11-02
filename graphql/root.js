@@ -51,10 +51,12 @@ const RootMutationType = new GraphQLObjectType({
             args: {
                 filename: { type: GraphQLNonNull(GraphQLString) },
                 content: { type: GraphQLNonNull(GraphQLString) },
-                owner: { type: GraphQLNonNull(GraphQLString) }
+                owner: { type: GraphQLNonNull(GraphQLString) },
+                mode: { type: GraphQLNonNull(GraphQLString) }
             },
             resolve: async function (parent, args)  {
-                return await files.newFile(undefined, args.filename, args.content, args.owner);
+                // eslint-disable-next-line max-len
+                return await files.newFile(undefined, args.filename, args.content, args.owner, args.mode);
             }
         },
 

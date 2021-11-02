@@ -5,10 +5,9 @@ process.env.NODE_ENV = 'test';
 //Require the dev-dependencies
 const chai = require('chai');
 const chaiHttp = require('chai-http');
-const HTMLParser = require('node-html-parser');
-
 const server = require('../app.js');
 var assert = require("assert");
+
 chai.should();
 
 const database = require("../db/database.js");
@@ -17,7 +16,7 @@ const collectionName = "editor";
 chai.use(chaiHttp);
 
 let token = "";
-let _id = "";
+
 
 describe('User_data', () => {
     before(() => {
@@ -44,6 +43,59 @@ describe('User_data', () => {
     });
 
     describe('GET /data', () => {
+        it('should get 401 as we do not provide valid token', (done) => {
+            chai.request(server)
+                .get("/data")
+                .end((err, res) => {
+                    res.should.have.status(401);
+                    res.body.should.be.an("object");
+                    res.body.errors.status.should.be.equal(401);
+
+                    done();
+                });
+        });
+
+        it('Register a new user', (done) => {
+            let user = {
+                email: "test@123.com",
+                password: "123456",
+            };
+
+            chai.request(server)
+                .post("/users/register")
+                .send(user)
+                .end((err, res) => {
+                    res.body.should.be.an("object");
+                    res.body.should.have.property("data");
+                    res.body.data.should.have.property("message");
+                    res.body.data.message.should.equal("User successfully registered.");
+                    done();
+                });
+        });
+        
+        it('should get 200 login user', (done) => {
+            let user = {
+                email: "test@123.com",
+                password: "123456",
+            };
+
+            chai.request(server)
+                .post("/users/login")
+                .send(user)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    res.body.should.be.an("object");
+                    res.body.should.have.property("data");
+                    res.body.data.user.should.have.property("email");
+                    res.body.data.user.email.should.equal("test@123.com");
+
+                    res.body.data.should.have.property("token");
+                    token = res.body.data.token;
+
+                    done();
+                });
+        });
+
         it('Adding one file', (done) => {
             let file = {
                 filename: "test3",
@@ -52,6 +104,7 @@ describe('User_data', () => {
 
             chai.request(server)
                 .post("/data")
+                .set("x-access-token", token)
                 .send(file)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -70,6 +123,7 @@ describe('User_data', () => {
 
             chai.request(server)
                 .post("/data")
+                .set("x-access-token", token)
                 .send(file)
                 .end((err, res) => {
                     res.should.have.status(201);
@@ -83,6 +137,7 @@ describe('User_data', () => {
         it('Getting all the files', (done) => {
             chai.request(server)
                 .get("/data")
+                .set("x-access-token", token)
                 .end((err, res) => {
                     res.should.have.status(200);
                     res.body.should.be.an("array");
@@ -90,9 +145,21 @@ describe('User_data', () => {
                 });
         });
 
+        // it('Getting all the files with graphql', (done) => {
+        //     chai.request(server)
+        //         .get("/graphql")
+        //         .set("x-access-token", token)
+        //         .end((err, res) => {
+        //             res.should.have.status(200);
+        //             res.body.should.be.an("array");
+        //             done();
+        //         });
+        // });
+
         it('Getting one file', (done) => {
             chai.request(server)
                 .get("/data/test3")
+                .set("x-access-token", token)
                 .end((err, res) => {
                     res.body.should.be.an("object");
                     res.body.should.have.property("filename");
@@ -100,7 +167,6 @@ describe('User_data', () => {
                     assert.equal(res.body.filename, "test3");
                     done();
                 });
-
         });
 
         it('Updating one file', (done) => {
@@ -111,6 +177,7 @@ describe('User_data', () => {
 
             chai.request(server)
                 .put("/data")
+                .set("x-access-token", token)
                 .send(file)
                 .end((err, res) => {
                     res.should.have.status(200);
@@ -128,6 +195,7 @@ describe('User_data', () => {
 
             chai.request(server)
                 .delete("/data")
+                .set("x-access-token", token)
                 .send(file)
                 .end((err, res) => {
                     res.should.have.status(204);
@@ -142,6 +210,7 @@ describe('User_data', () => {
 
             chai.request(server)
                 .delete("/data")
+                .set("x-access-token", token)
                 .send(file)
                 .end((err, res) => {
                     res.should.have.status(404);

@@ -1,8 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+
+require('dotenv').config();
+
 const path = require('path');
 const morgan = require('morgan');
 const cors = require('cors');
+const convertHTMLToPDF = require('pdf-puppeteer');
 
 const app = express();
 const httpServer = require("http").createServer(app);
@@ -41,6 +45,10 @@ io.on('connection', function (socket) {
         socket.to(data["_id"]).emit("doc", data.html);
         // console.log(data);
     });
+
+    // socket.on('disconnect', function () {
+    //     console.log('user disconnected');
+    // });
 });
 
 
@@ -82,8 +90,67 @@ app.use('/graphql',
 
 app.use("/users", auth);
 app.use("/data", data);
+app.use(
+    bodyParser.text({
+        limit: '50mb'
+    })
+);
 app.get('/', function (req, res) {
     res.send('hello world');
+});
+
+app.post("/pdf", async function (req, res) {
+    // to download to loacl filesystem with custom name pass a
+    // "path" option. see the page.pdf docs for more info
+    // https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md#pagepdfoptions
+    console.log(req.body);
+    convertHTMLToPDF(
+        req.body,
+        pdf => {
+            res.setHeader('Content-Type', 'application/pdf');
+            res.send(pdf);
+        },
+        null,
+        null,
+        true
+    ).catch(err => {
+        console.log(err);
+        res.status(500).send(err);
+    });
+});
+
+// Send email
+const sgMail = require('@sendgrid/mail');
+
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+app.post("/send", async (req, res, next) => {
+    try {
+        const { template, variables, to, subject, from } = req.body;
+        console.log(req.body);
+        let html = template;
+
+        // Object.keys(variables).forEach(variable => {
+        //     html = html.replace(`[[${variable}]]`, variables[variable]);
+        // });
+        const msg = {
+            to,
+            from,
+            subject,
+            html
+        };
+
+        sgMail.send(msg)
+            .then(() => {
+                console.log('Email sent');
+                res.json({"message": "Invitation has sent out!"});
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    } catch (ex) {
+        res.json(ex);
+    }
 });
 
 

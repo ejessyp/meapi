@@ -186,9 +186,10 @@ const graphData = {
 
 
     newFile: async function newFile(
-        res, filename, content, owner
+        res, filename, content, owner, mode
     ) {
         let db;
+        const allowed = [];
 
         try {
             db = await database.getDb();
@@ -196,7 +197,9 @@ const graphData = {
             const data = {
                 "filename": filename,
                 "content": content,
-                "owner": owner
+                "owner": owner,
+                "mode": mode,
+                "allowed": allowed
             };
 
             // console.log(data);

@@ -23,24 +23,34 @@ describe('app', () => {
                 });
         });
 
-        // it('page should contain H1 with auth', (done) => {
-        //     chai.request(server)
-        //         .get("/")
-        //         .end((err, res) => {
-        //             res.should.have.status(200);
-        //             res.text.should.be.a("string");
-        //
-        //             let HTMLResponse = HTMLParser.parse(res.text);
-        //             let h1Element = HTMLResponse.querySelector('h1');
-        //
-        //             h1Element.should.be.an("object");
-        //
-        //             var h1Text = h1Element.childNodes[0].rawText;
-        // 
-        //             h1Text.should.equal("auth Documentation");
-        //
-        //             done();
-        //         });
-        // });
+        it('Create pdf', (done) => {
+            let content = "<strong>This is a test of pdf.</strong>";
+
+            chai.request(server)
+                .post("/pdf")
+                .set('content-type', ' text/plain')
+                .send(content)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
+
+        it('Send email with sendgrid!', (done) => {
+            let emailConfig = {
+                to: "ejessyp@gmail.com",
+                from: "qipa19@student.bth.se",
+                subject: "Invitation of editing file ",
+                template: "Please click to <a href=http://localhost:3000>Register</a>"
+            };
+
+            chai.request(server)
+                .post("/send")
+                .send(emailConfig)
+                .end((err, res) => {
+                    res.should.have.status(200);
+                    done();
+                });
+        });
     });
 });

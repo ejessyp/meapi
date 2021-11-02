@@ -69,9 +69,6 @@ const data = {
     },
 
     createData: async function (res, req) {
-        // req contains user object set in checkToken middleware
-        // let apiKey = req.body.api_key;
-        // let email = req.user.email;
         let db;
 
         try {
@@ -79,7 +76,8 @@ const data = {
             const data = {
                 "filename": req.body.filename,
                 "content": req.body.content,
-                "owner": req.user.email
+                "owner": req.user.email,
+                "mode": req.body.mode
             };
 
             console.log(data);
@@ -115,7 +113,7 @@ const data = {
                 db = await database.getDb();
 
                 // eslint-disable-next-line max-len
-                const result = await db.collection.findOneAndUpdate(filter, { $set: { "content": req.body.content } },
+                const result = await db.collection.findOneAndUpdate(filter, { $set: { "content": req.body.content, "mode": req.body.mode } },
                     { returnDocument: "after" });
 
                 return res.json(result.value);
@@ -158,6 +156,7 @@ const data = {
                 // eslint-disable-next-line max-len
                 const result = await db.collection.findOneAndUpdate(filter, { $addToSet: { "allowed": req.body.allowed } },
                     { returnDocument: "after" });
+
                 console.log(result.value);
                 return res.json(result.value);
             } catch (e) {
@@ -198,7 +197,8 @@ const data = {
                 db = await database.getDb();
 
                 const result = await db.collection.deleteOne(filter);
-                // console.log(res.deletedCount);
+
+                console.log("delete file", result);
 
                 if (result.deletedCount === 1) {
                     return res.status(204).send();
