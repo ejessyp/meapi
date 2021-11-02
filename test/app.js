@@ -1,6 +1,8 @@
 /* global it describe */
 
 process.env.NODE_ENV = 'test';
+// eslint-disable-next-line max-len
+process.env.SENDGRID_API_KEY = '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';
 
 //Require the dev-dependencies
 const chai = require('chai');

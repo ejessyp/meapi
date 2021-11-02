@@ -127,6 +127,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 app.post("/send", async (req, res, next) => {
     try {
         const { template, variables, to, subject, from } = req.body;
+
         console.log(req.body);
         let html = template;
 
