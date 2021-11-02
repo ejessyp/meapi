@@ -96,10 +96,11 @@ const auth = {
             db = await databaseAuth.getDb();
 
             const filter = {
-                    "email": email
+                "email": email
             };
 
             const user = await db.collection.findOne(filter);
+
             console.log(user);
             if (user) {
                 return auth.comparePasswords(
